@@ -31,3 +31,7 @@ C:\Learning\Web API\DemoProject\DemoProject\obj\Debug\net7.0\refint\DemoProject.
 C:\Learning\Web API\DemoProject\DemoProject\obj\Debug\net7.0\DemoProject.pdb
 C:\Learning\Web API\DemoProject\DemoProject\obj\Debug\net7.0\DemoProject.genruntimeconfig.cache
 C:\Learning\Web API\DemoProject\DemoProject\obj\Debug\net7.0\ref\DemoProject.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Newtonsoft.Json.Bson.dll
