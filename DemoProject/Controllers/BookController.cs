@@ -1,4 +1,7 @@
-﻿using DemoProject.Data;
+﻿using AutoMapper;
+using DemoProject.Data;
+using DemoProject.Logger;
+using DemoProject.Models;
 using DemoProject.Models.DTO;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
@@ -10,51 +13,68 @@ namespace DemoProject.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<IEnumerable<BookDTO>> GetBooks()
+        private readonly ILogging _logger;
+
+        private readonly IBookStore _bookStore;
+
+        private List<Book> books;
+
+        private IMapper _mapper;
+
+        public BookController(ILogging logger, IBookStore bookStore, IMapper mapper)
         {
-            return Ok(BookStore.BookDTOs);
+            _logger = logger;
+            _bookStore = bookStore;
+            books = _bookStore.GetAllBooks().ToList();
+            _mapper = mapper;
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<BookGetDTO>> GetBooks()
+        {
+            _logger.Log("Get all books", "debug");
+
+            var booksGetDTO = _mapper.Map<List<BookGetDTO>>(books);
+            return Ok(booksGetDTO);
         }
 
         [HttpGet("{id:int}", Name = "GetBook")]
-        public ActionResult<BookDTO> GetBook(int id)
+        public ActionResult<BookGetDTO> GetBook(int id)
         {
-            var book = BookStore.BookDTOs.FirstOrDefault(x => x.Id == id);
+            var book = books.First(x=>x.Id == id);
 
             if (book == null)
             {
                 return NotFound();
             }
 
-            return Ok(book);
+            var bookGetDTO = _mapper.Map<BookGetDTO>(book);
+            return Ok(bookGetDTO);
         }
 
         [HttpPost]
-        public ActionResult<BookDTO> AddBook([FromBody] BookDTO bookDTO)
+        public ActionResult<BookCreateDTO> AddBook([FromBody] BookCreateDTO bookCreateDTO)
         {
-            if (bookDTO == null)
+            if (bookCreateDTO == null)
             {
-                return BadRequest(bookDTO);
+                return BadRequest(bookCreateDTO);
             }
 
-            if (bookDTO.Id > 0)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-            if (bookDTO.PageNumber > 3000)
+            if (bookCreateDTO.PageNumber > 3000)
             {
                 ModelState.AddModelError("CustomError", "Book store doesn't contain books with 3000 pages or more.");
                 return BadRequest(ModelState);
             }
 
-            var id = BookStore.BookDTOs.Max(x => x.Id);
+            var id = books.Max(x => x.Id);
 
-            bookDTO.Id = id + 1;
+            var book = _mapper.Map<Book>(bookCreateDTO);
+            book.Id = id + 1;
 
-            BookStore.BookDTOs.Add(bookDTO);
+            books.Add(book);
 
-            return CreatedAtRoute("GetBook", new { id = bookDTO.Id }, bookDTO);
+            var bookGetDTO = _mapper.Map<BookGetDTO>(book);
+            return CreatedAtRoute("GetBook", new { id = book.Id }, bookGetDTO);
         }
 
         [HttpDelete("{id:int}", Name = "DeleteBook")]
@@ -65,59 +85,61 @@ namespace DemoProject.Controllers
                 return BadRequest();
             }
 
-            var book = BookStore.BookDTOs.FirstOrDefault(x => x.Id == id);
+            var book = books.FirstOrDefault(x => x.Id == id);
 
             if (book == null)
             {
                 return NotFound();
             }
 
-            BookStore.BookDTOs.Remove(book);
+            books.Remove(book);
 
             return NoContent();
         }
 
         [HttpPut("{id:int}", Name = "UpdateBook")]
-        public IActionResult UpdateBook(int bookId, [FromBody] BookDTO bookDTO)
+        public IActionResult UpdateBook(int bookId, [FromBody] BookUpdateDTO bookUpdateDTO)
         {
-            if (bookDTO == null || bookDTO.Id != bookId)
+            if (bookUpdateDTO == null || bookUpdateDTO.Id != bookId)
             {
                 return BadRequest();
             }
 
-            var book = BookStore.BookDTOs.First(x => x.Id == bookId);
+            var book = books.First(x => x.Id == bookId);
 
             if (book == null)
             {
                 return BadRequest();
             }
 
-            book.Id = bookDTO.Id;
-            book.Name = bookDTO.Name;
-            book.PageNumber = bookDTO.PageNumber;
-            book.Author = bookDTO.Author;
-            book.Description = bookDTO.Description;
+            book.Id = bookUpdateDTO.Id;
+            book.Name = bookUpdateDTO.Name;
+            book.PageNumber = bookUpdateDTO.PageNumber;
+            book.Author = bookUpdateDTO.Author;
+            book.Description = bookUpdateDTO.Description;
 
 
             return NoContent();
         }
 
         [HttpPatch("{id:int}", Name = "UpdatePartialBook")]
-        public IActionResult UpdateParitalBook(int id, JsonPatchDocument<BookDTO> patchDTO)
+        public IActionResult UpdateParitalBook(int id, JsonPatchDocument<BookUpdateDTO> patchDTO)
         {
             if (patchDTO == null || id == 0) 
             { 
                 return BadRequest(); 
             }
 
-            var book = BookStore.BookDTOs.First(x => x.Id == id);
+            var book = books.First(x => x.Id == id);
 
             if (book == null)
             {
                 return BadRequest();
             }
 
-            patchDTO.ApplyTo(book);
+            var bookUpdateDto = _mapper.Map<BookUpdateDTO>(book);
+
+            patchDTO.ApplyTo(bookUpdateDto);
 
             return NoContent();
         }

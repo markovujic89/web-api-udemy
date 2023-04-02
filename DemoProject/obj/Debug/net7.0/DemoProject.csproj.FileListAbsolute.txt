@@ -35,3 +35,7 @@ C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Microsoft.AspNetCor
 C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Newtonsoft.Json.dll
 C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Newtonsoft.Json.Bson.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Serilog.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\Serilog.Sinks.File.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\AutoMapper.dll
+C:\Learning\Web API\DemoProject\DemoProject\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
